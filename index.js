@@ -51,13 +51,19 @@ function IssueLinker() {
 		self.init(remarkable);
 	};
 	self.__proto__ = IssueLinker.prototype;
-	self.regex = /https?:\/\/github\.com\/([a-z][a-z-]+)\/([a-z][a-z-]+)\/issues\/(\d+)/i;
+	self.issueRegex = /https?:\/\/github\.com\/([a-z][a-z-]+)\/([a-z][a-z-]+)\/issues\/(\d+)/i;
+
+	// see http://stackoverflow.com/a/12093994/2373138
+	self.fileRegex = "^https?:\\/\\/github\\.com\\/([a-z0-9][a-z0-9\\-]+)\\/([a-z0-9][a-z0-9-]+)\\/blob\\/";
+	var branch = "([a-z0-9\\-.]+)";
+	self.fileRegex = new RegExp(self.fileRegex + branch + "\\/([a-z0-9\\/\\-\\._]+)(#L(\\d+))?$", "i");
+
 	self.id = "linkify";
 	return self;
 };
 
 IssueLinker.prototype.init = function(remarkable) {
-	remarkable.core.ruler.rules[8].fn = this.parse.bind(this);
+	remarkable.core.ruler.at('linkify', this.parse.bind(this));
 };
 
 IssueLinker.prototype.parse = function(state, silent) {
@@ -115,12 +121,18 @@ IssueLinker.prototype.parse = function(state, silent) {
 						continue;
 					}
 
-					var match = this.regex.exec(links[ln].url);
+					var match = this.issueRegex.exec(links[ln].url);
 
 					if (match) {
 						textReplace = match[1] + "/" + match[2] + "#" + match[3];
 					} else {
-						textReplace = null;
+						var match = this.fileRegex.exec(links[ln].url);
+
+						if (match) {
+							textReplace = match[4] + (match[6] ? ":" + match[6] : "") + " @ " + match[1] + " / " + match[2] + (match[3] === "master" ? "" : " @ " + match[3]);
+						} else {
+							textReplace = null;
+						}
 					}
 
 					pos = text.indexOf(links[ln].text);
