@@ -1,10 +1,12 @@
-var remarkable = new (require("remarkable"))();
-remarkable.use(require("../lib/issue-linker")());
+var remarkable = new (require("remarkable"))({linkify: true});
+remarkable.use(require("../.")());
 
 var output = remarkable.render("There's a new issue at GitHub: https://github.com/jonschlinkert/remarkable/issues/117");
-var expect = '<p>There\'s a new issue at GitHub: <a href="https://github.com/jonschlinkert/remarkable/issues/117" target="_blank"><i class="fa fa-github"></i>jonschlinkert/remarkable#117</a></p>';
+var expect = '<p>There\'s a new issue at GitHub: <a href="https://github.com/jonschlinkert/remarkable/issues/117">jonschlinkert/remarkable#117</a></p>';
 
-if(output !== expect) {
+if(output != expect + "\n") {
 	console.log(output);
 	process.exit(1);
+} else {
+	console.log("\n    ---     all tests worked     ---   \n");
 }
