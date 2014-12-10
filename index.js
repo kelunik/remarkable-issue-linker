@@ -124,12 +124,12 @@ IssueLinker.prototype.parse = function(state, silent) {
 					var match = this.issueRegex.exec(links[ln].url);
 
 					if (match) {
-						textReplace = match[1] + "/" + match[2] + "#" + match[3];
+						textReplace = match[1] + " / " + match[2] + " #" + match[3];
 					} else {
 						var match = this.fileRegex.exec(links[ln].url);
 
 						if (match) {
-							textReplace = match[4] + (match[6] ? ":" + match[6] : "") + " @ " + match[1] + " / " + match[2] + (match[3] === "master" ? "" : " @ " + match[3]);
+							textReplace = match[4] + (match[6] ? ":" + match[6] : "") + " in " + match[1] + " / " + match[2] + (match[3] === "master" ? "" : " @ " + match[3]);
 						} else {
 							textReplace = null;
 						}
